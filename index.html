@@ -3,451 +3,437 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>你的「隐形压力指数」有多高？</title>
+<title>你的「隐形压力指数」有多高？| 专业心理评估</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  *,::before,::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --ink: 215 28% 17%;
+    --cream: 40 23% 95%;
+    --green: 155 40% 45%;
+    --amber: 30 85% 55%;
+    --rose: 350 65% 55%;
+    --bg: var(--cream);
+    --fg: var(--ink);
+    --card: 0 0% 100%;
+    --muted: 40 20% 90%;
+    --radius: 16px;
+  }
+  body{
+    font-family: -apple-system,"PingFang SC","Helvetica Neue",ui-sans-serif,system-ui,sans-serif;
+    background: hsl(var(--bg));
+    color: hsl(var(--fg));
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 20px;
+    padding: 16px;
   }
-  .container {
+  .app{
     max-width: 480px;
     width: 100%;
-    background: rgba(255,255,255,0.95);
-    border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
-    padding: 32px 24px;
-    margin-top: 20px;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0,0,0,.07);
+    overflow: hidden;
     position: relative;
-    overflow: hidden;
   }
-  .badge {
-    display: inline-block;
-    background: #667eea;
-    color: #fff;
-    font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 12px;
+  .app-inner{padding: 28px 24px 24px}
+
+  /* ===== START SCREEN ===== */
+  .screen{display:none}
+  .screen.active{display:block;animation: in .4s ease-out}
+  @keyframes in{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+  .start-wrap{text-align:center;padding:8px 0}
+  .start-icon{font-size:72px;margin-bottom:12px;animation:pulse 2s ease-in-out infinite}
+  .start-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:hsl(var(--ink)/.08);color:hsl(var(--ink));
+    font-size:12px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:16px;
   }
-  h1 {
-    font-size: 22px;
-    color: #1a1a2e;
-    margin-bottom: 8px;
-    line-height: 1.4;
+  .start-wrap h1{font-size:24px;font-weight:800;line-height:1.35;margin-bottom:8px;color:hsl(var(--ink))}
+  .start-wrap .sub{font-size:14px;color:hsl(var(--ink)/.6);line-height:1.7;margin-bottom:8px}
+  .start-features{
+    display:flex;flex-direction:column;gap:8px;margin:20px 0 28px;text-align:left;
+    background:hsl(var(--ink)/.04);border-radius:12px;padding:16px;
   }
-  .subtitle {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 24px;
+  .start-features span{font-size:13px;color:hsl(var(--ink)/.7);display:flex;align-items:center;gap:8px}
+  .start-features span::before{content:'';width:6px;height:6px;border-radius:50%;background:hsl(var(--green));flex-shrink:0}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    width:100%;padding:14px 32px;border:none;border-radius:30px;
+    font-size:16px;font-weight:700;cursor:pointer;
+    background:hsl(var(--ink));color:#fff;
+    transition:all .25s;position:relative;overflow:hidden;
   }
-  /* Progress bar */
-  .progress-wrap {
-    background: #eee;
-    border-radius: 10px;
-    height: 6px;
-    margin-bottom: 24px;
-    overflow: hidden;
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px hsl(var(--ink)/.25)}
+  .btn:active{transform:translateY(0)}
+  .btn-outline{background:transparent;color:hsl(var(--ink));border:2px solid hsl(var(--ink)/.15)}
+  .btn-outline:hover{background:hsl(var(--ink)/.05);box-shadow:none}
+  .btn-sm{width:auto;padding:10px 24px;font-size:14px}
+  .disclaimer{font-size:11px;color:hsl(var(--ink)/.35);text-align:center;margin-top:20px;line-height:1.5}
+
+  /* ===== QUIZ ===== */
+  .quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .quiz-badge{font-size:12px;font-weight:600;color:hsl(var(--ink)/.5)}
+  .quiz-counter{font-size:13px;font-weight:700;color:hsl(var(--ink)/.6);font-variant-numeric:tabular-nums;font-family:'JetBrains Mono','SF Mono',monospace}
+  .progress-track{width:100%;height:4px;background:hsl(var(--ink)/.1);border-radius:4px;margin-bottom:32px;overflow:hidden}
+  .progress-fill{height:100%;background:hsl(var(--green));border-radius:4px;transition:width .6s cubic-bezier(.22,1,.36,1);width:0%}
+
+  .question-wrap{animation:in .35s ease-out}
+  .q-num{font-size:12px;font-weight:700;color:hsl(var(--rose));letter-spacing:.5px;margin-bottom:4px}
+  .q-text{font-size:18px;font-weight:700;line-height:1.5;margin-bottom:24px;color:hsl(var(--ink))}
+  .q-dim{font-size:11px;color:hsl(var(--ink)/.4);margin-top:-16px;margin-bottom:20px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    padding:14px 16px;border:2px solid hsl(var(--ink)/.1);border-radius:12px;
+    cursor:pointer;font-size:15px;color:hsl(var(--ink)/.8);transition:all .2s;
+    background:#fff;text-align:left;line-height:1.4;
   }
-  .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    border-radius: 10px;
-    transition: width 0.4s ease;
+  .opt:hover{border-color:hsl(var(--ink)/.3);background:hsl(var(--ink)/.03)}
+  .opt.selected{border-color:hsl(var(--ink));background:hsl(var(--ink)/.06);color:hsl(var(--ink));font-weight:600}
+  .opt .label{display:block}
+  .opt .score-tag{display:none}
+
+  /* ===== RESULT ===== */
+  .result-hero{text-align:center;padding:8px 0 16px}
+  .result-icon{font-size:72px;margin-bottom:4px}
+  .result-title{font-size:28px;font-weight:800;margin-bottom:2px}
+  .result-sub{font-size:14px;color:hsl(var(--ink)/.5);margin-bottom:20px}
+
+  /* Gauge */
+  .gauge-wrap{position:relative;width:180px;height:90px;margin:0 auto 8px;overflow:hidden}
+  .gauge-wrap svg{width:180px;height:180px}
+  .gauge-score{
+    position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+    font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;
+    font-family:'JetBrains Mono','SF Mono',monospace;
   }
-  .progress-text {
-    text-align: right;
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 8px;
+  .gauge-score span{font-size:16px;font-weight:400;color:hsl(var(--ink)/.4)}
+
+  /* Score Tag */
+  .score-tag{
+    display:inline-flex;padding:4px 16px;border-radius:20px;
+    font-size:13px;font-weight:700;margin-bottom:20px;
   }
 
-  /* Question */
-  .question {
-    display: block;
-    animation: fadeIn 0.3s ease;
+  /* Detail Cards */
+  .detail-card{
+    background:hsl(var(--ink)/.04);border-radius:12px;padding:16px;margin-bottom:12px;
   }
-  .question.hidden { display: none; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .q-num {
-    font-size: 13px;
-    color: #667eea;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .q-text {
-    font-size: 17px;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
-  .options { display: flex; flex-direction: column; gap: 10px; }
-  .option {
-    padding: 14px 16px;
-    border: 2px solid #e8e8e8;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 15px;
-    color: #333;
-    transition: all 0.2s;
-    background: #fff;
-    text-align: left;
-    line-height: 1.4;
-  }
-  .option:hover { border-color: #667eea; background: #f8f9ff; }
-  .option.selected { border-color: #667eea; background: #eef0ff; color: #4a3f8a; font-weight: 500; }
+  .detail-card h3{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .detail-card p{font-size:14px;color:hsl(var(--ink)/.7);line-height:1.7}
+  .detail-card.amber{background:hsl(var(--amber)/.12)}
+  .detail-card.amber h3{color:hsl(var(--amber))}
 
-  /* Start page */
-  .start-page { text-align: center; padding: 20px 0; }
-  .start-page .icon { font-size: 64px; margin-bottom: 16px; }
-  .start-page .desc { font-size: 14px; color: #666; line-height: 1.7; margin-bottom: 28px; }
-  .btn {
-    display: inline-block;
-    padding: 14px 48px;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-    box-shadow: 0 8px 24px rgba(102,126,234,0.35);
-  }
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(102,126,234,0.45);
-  }
-  .btn:active { transform: translateY(0); }
-  .btn-secondary {
-    background: #f0f0f0;
-    color: #333;
-    box-shadow: none;
-  }
-  .btn-secondary:hover { background: #e4e4e4; box-shadow: none; transform: none; }
+  /* Radar Chart */
+  .radar-wrap{background:hsl(var(--ink)/.04);border-radius:12px;padding:16px;margin-bottom:12px}
+  .radar-wrap h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+  .radar-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .dim-item{padding:10px 12px;background:#fff;border-radius:8px;border:1px solid hsl(var(--ink)/.06)}
+  .dim-label{font-size:12px;color:hsl(var(--ink)/.5);margin-bottom:4px}
+  .dim-bar{height:6px;background:hsl(var(--ink)/.08);border-radius:8px;overflow:hidden}
+  .dim-fill{height:100%;border-radius:8px;transition:width 1.2s cubic-bezier(.22,1,.36,1);width:0%}
 
-  /* Result page */
-  .result-page { text-align: center; animation: fadeIn 0.5s ease; }
-  .result-page.hidden { display: none; }
-  .result-icon { font-size: 80px; margin-bottom: 8px; }
-  .result-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-  .result-sub { font-size: 14px; color: #888; margin-bottom: 20px; }
-  .result-card {
-    background: #f8f9ff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    text-align: left;
+  /* Share Card */
+  .share-card{
+    background:hsl(var(--ink));color:#fff;border-radius:16px;padding:24px;
+    margin-bottom:16px;position:relative;overflow:hidden;
   }
-  .result-card h3 { font-size: 15px; color: #667eea; margin-bottom: 8px; }
-  .result-card p { font-size: 14px; color: #555; line-height: 1.7; }
-  .result-score {
-    font-size: 48px;
-    font-weight: 800;
-    color: #667eea;
-    margin: 8px 0;
+  .share-card::before{
+    content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;
+    border-radius:50%;background:hsla(0,0%,100%,.05);
   }
-  .result-score span { font-size: 18px; font-weight: 400; color: #888; }
-  .result-tips {
-    background: #fff3e0;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 13px;
-    color: #e65100;
-    line-height: 1.6;
-    margin-top: 12px;
+  .share-card .share-icon{font-size:48px;margin-bottom:8px}
+  .share-card .share-title{font-size:22px;font-weight:800;margin-bottom:4px}
+  .share-card .share-score{font-size:40px;font-weight:800;margin:8px 0;font-variant-numeric:tabular-nums}
+  .share-card .share-sub{font-size:12px;opacity:.6;margin-bottom:12px}
+  .share-card .share-dim{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .share-card .share-dim span{
+    background:hsla(0,0%,100%,.12);padding:3px 10px;border-radius:12px;
+    font-size:11px;font-weight:600;
   }
-  .result-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  .share-note {
-    font-size: 13px;
-    color: #999;
-    margin-top: 16px;
-    border-top: 1px solid #eee;
-    padding-top: 16px;
-  }
-  .share-note strong { color: #667eea; }
+  .share-hint{font-size:12px;color:hsl(var(--ink)/.4);text-align:center;margin-bottom:16px}
 
-  /* Disclaimer */
-  .disclaimer {
-    font-size: 11px;
-    color: #bbb;
-    text-align: center;
-    margin-top: 20px;
-    line-height: 1.5;
-  }
+  /* Actions */
+  .result-actions{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+
+  /* Typewriter */
+  .typewriter{overflow:hidden;display:inline}
+
+  .fade-in-left{animation:fl .4s ease-out both}
+  @keyframes fl{0%{opacity:0;transform:translateX(-8px)}100%{opacity:1;transform:translateX(0)}}
+  .delay-1{animation-delay:.1s}
+  .delay-2{animation-delay:.2s}
+  .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s}
+  .delay-5{animation-delay:.5s}
 </style>
 </head>
 <body>
-<div class="container" id="app">
-  <!-- Loading / Start -->
-  <div id="startPage" class="start-page">
-    <div class="badge">🔍 心理测试</div>
-    <div class="icon">🧠</div>
-    <h1>你的「隐形压力指数」有多高？</h1>
-    <p class="desc">
-      有些压力你看得见，有些压力藏在你的身体和情绪里。<br>
-      8 道题，花 2 分钟，测测你的隐形压力等级。
-    </p>
-    <button class="btn" onclick="startTest()">开始测试</button>
-    <div class="disclaimer">仅供娱乐参考，不构成心理诊断</div>
-  </div>
+<div class="app" id="app">
+  <div class="app-inner">
 
-  <!-- Questions -->
-  <div id="questionPage" class="question hidden">
-    <div class="badge" id="qBadge">🧠 隐形压力测试</div>
-    <div class="progress-text" id="progressText">1 / 8</div>
-    <div class="progress-wrap">
-      <div class="progress-bar" id="progressBar" style="width: 12.5%"></div>
+    <!-- ===== START ===== -->
+    <div id="screenStart" class="screen active">
+      <div class="start-wrap">
+        <div class="start-icon">🧠</div>
+        <div class="start-badge">✦ 专业心理评估</div>
+        <h1>你的「隐形压力指数」<br>有多高？</h1>
+        <p class="sub">
+          有些压力你看得见，有些藏在身体和情绪里。<br>
+          15 道题，从 5 个维度评估你的真实压力水平。
+        </p>
+        <div class="start-features">
+          <span>15 道精选题，覆盖睡眠·情绪·社交·身体·认知</span>
+          <span>多维度分析，生成专属压力画像</span>
+          <span>附个性化减压方案，约 3 分钟完成</span>
+        </div>
+        <button class="btn" onclick="startQuiz()">开始测试  →</button>
+        <div class="disclaimer">仅供娱乐参考，不构成心理诊断<br>如持续不适请寻求专业帮助</div>
+      </div>
     </div>
-    <div id="questionContainer"></div>
-  </div>
 
-  <!-- Result -->
-  <div id="resultPage" class="result-page hidden">
-    <div class="badge">📊 测试结果</div>
-    <div id="resultContent"></div>
-    <div class="disclaimer">仅供娱乐参考，不构成心理诊断</div>
+    <!-- ===== QUIZ ===== -->
+    <div id="screenQuiz" class="screen">
+      <div class="quiz-header">
+        <span class="quiz-badge">🧠 隐形压力测试</span>
+        <span class="quiz-counter" id="qCounter">01 / 15</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="qProgress"></div></div>
+      <div id="qContainer"></div>
+    </div>
+
+    <!-- ===== RESULT ===== -->
+    <div id="screenResult" class="screen">
+      <div id="rContainer"></div>
+      <div class="disclaimer">仅供娱乐参考，不构成心理诊断</div>
+    </div>
+
   </div>
 </div>
 
 <script>
-const QUESTIONS = [
-  {
-    text: "最近一个月，你早上醒来的感觉是？",
-    options: [
-      { label: "自然醒，精力充沛", score: 1 },
-      { label: "醒来后还想再躺一会儿", score: 2 },
-      { label: "闹钟响了很久才挣扎着起来", score: 3 },
-      { label: "经常在凌晨醒来，再也睡不着", score: 4 }
-    ]
-  },
-  {
-    text: "面对日常烦心事（如排队、堵车等），你的反应是？",
-    options: [
-      { label: "完全不在意，该干嘛干嘛", score: 1 },
-      { label: "有点烦躁，但能快速调整", score: 2 },
-      { label: "容易生气，觉得事事不顺", score: 3 },
-      { label: "经常因为小事情绪崩溃", score: 4 }
-    ]
-  },
-  {
-    text: "你最近对社交活动的态度是？",
-    options: [
-      { label: "很期待，和朋友们约得很开心", score: 1 },
-      { label: "还行，偶尔会想社交", score: 2 },
-      { label: "不想出门，但被迫去也能应付", score: 3 },
-      { label: "完全不想见任何人，只想一个人待着", score: 4 }
-    ]
-  },
-  {
-    text: "你最近的身体有哪些信号？",
-    options: [
-      { label: "身体状态良好，没什么不适", score: 1 },
-      { label: "偶尔头痛或肩颈酸痛", score: 2 },
-      { label: "经常胃痛、头痛或心慌", score: 3 },
-      { label: "多种身体不适，检查又没查出问题", score: 4 }
-    ]
-  },
-  {
-    text: "你最近面对工作/学习任务时？",
-    options: [
-      { label: "高效完成，有成就感", score: 1 },
-      { label: "能完成，但需要一些额外的努力", score: 2 },
-      { label: "经常拖延，做一会儿就想放弃", score: 3 },
-      { label: "完全无法集中注意力，效率极低", score: 4 }
-    ]
-  },
-  {
-    text: "你最近的情绪状态是怎样的？",
-    options: [
-      { label: "总体平稳，大部分时间开心", score: 1 },
-      { label: "偶尔低落，但很快能恢复", score: 2 },
-      { label: "经常感到闷闷不乐或焦虑", score: 3 },
-      { label: "长期情绪低落，对什么都提不起兴趣", score: 4 }
-    ]
-  },
-  {
-    text: "你最近对未来的感觉是？",
-    options: [
-      { label: "充满期待，有很多想做的事", score: 1 },
-      { label: "平稳推进，走一步看一步", score: 2 },
-      { label: "有些迷茫，不知道未来会怎样", score: 3 },
-      { label: "觉得没有希望，做什么都没意义", score: 4 }
-    ]
-  },
-  {
-    text: "你最近有放松和娱乐的时间吗？",
-    options: [
-      { label: "有，我定期会给自己安排放松时间", score: 1 },
-      { label: "偶尔会放松一下，但不太规律", score: 2 },
-      { label: "很少放松，觉得没时间也没心情", score: 3 },
-      { label: "完全放松不下来，即使休息也在想事情", score: 4 }
-    ]
-  }
+// ===== 15 QUESTIONS with dimension tags =====
+const QS = [
+  {dim:'睡眠', text:'最近一个月，你早上醒来通常是什么感觉？', opts:[
+    {l:'自然醒，精力充沛',s:1},{l:'醒了但想再躺一会儿',s:2},{l:'闹钟响很久才挣扎起来',s:3},{l:'凌晨常醒或早醒',s:4}
+  ]},
+  {dim:'睡眠', text:'你最近一个月的睡眠质量如何？', opts:[
+    {l:'入睡快，睡眠深，时长充足',s:1},{l:'偶尔入睡困难或睡眠浅',s:2},{l:'经常睡不够，或多梦易醒',s:3},{l:'长期失眠，靠助眠方式才能睡',s:4}
+  ]},
+  {dim:'情绪', text:'面对日常烦心事（排队、堵车等），你的反应是？', opts:[
+    {l:'完全不在意，情绪平稳',s:1},{l:'有点烦但能迅速调整',s:2},{l:'容易生气，觉得事事不顺',s:3},{l:'经常因小事情绪崩溃',s:4}
+  ]},
+  {dim:'情绪', text:'你最近的整体情绪状态是？', opts:[
+    {l:'总体平稳，大部分时间开心',s:1},{l:'偶尔低落，但能较快恢复',s:2},{l:'经常闷闷不乐或莫名焦虑',s:3},{l:'长期低落，对什么都提不起劲',s:4}
+  ]},
+  {dim:'情绪', text:'你最近对自己/生活的评价是？', opts:[
+    {l:'满意，觉得自己做得不错',s:1},{l:'还行，有改进空间但不焦虑',s:2},{l:'经常自我怀疑，觉得自己不够好',s:3},{l:'持续否定自己，觉得做什么都没意义',s:4}
+  ]},
+  {dim:'社交', text:'你最近对社交活动的态度是？', opts:[
+    {l:'很期待和朋友相处',s:1},{l:'偶尔想社交，但需要提前充电',s:2},{l:'不想出门，但被迫也能应付',s:3},{l:'完全不想见任何人，只想独处',s:4}
+  ]},
+  {dim:'社交', text:'当收到朋友邀约时，你第一反应是？', opts:[
+    {l:'开心，立马回复答应',s:1},{l:'想去的，但会犹豫一下',s:2},{l:'下意识想拒绝，需要说服自己去',s:3},{l:'直接找借口推掉',s:4}
+  ]},
+  {dim:'身体', text:'你最近的身体有哪些信号？', opts:[
+    {l:'状态良好，无明显不适',s:1},{l:'偶尔头痛、肩颈酸或胃胀',s:2},{l:'经常头痛/胃痛/心慌/胸闷',s:3},{l:'多种不适且体检没查出原因',s:4}
+  ]},
+  {dim:'身体', text:'你最近的食欲和消化情况是？', opts:[
+    {l:'正常，胃口好',s:1},{l:'偶尔没胃口或吃太多',s:2},{l:'经常暴饮暴食或完全没食欲',s:3},{l:'持续食欲紊乱伴消化问题',s:4}
+  ]},
+  {dim:'认知', text:'面对工作/学习任务，你最近的表现是？', opts:[
+    {l:'高效专注，有成就感',s:1},{l:'能完成但需要额外努力',s:2},{l:'经常拖延，做一会儿就想放弃',s:3},{l:'完全无法集中，效率极低',s:4}
+  ]},
+  {dim:'认知', text:'你最近的记忆力怎么样？', opts:[
+    {l:'和平时一样，很正常',s:1},{l:'偶尔忘事，但不影响生活',s:2},{l:'经常忘记刚说过/做过的事',s:3},{l:'明显感觉脑子变慢，记不住东西',s:4}
+  ]},
+  {dim:'认知', text:'你最近做决定的能力如何？', opts:[
+    {l:'果断，能快速做出选择',s:1},{l:'小事果断，大事会犹豫',s:2},{l:'经常纠结，连小事都反复想',s:3},{l:'完全不想做任何决定',s:4}
+  ]},
+  {dim:'身体', text:'你是否有不明原因的身体不适？', opts:[
+    {l:'没有',s:1},{l:'偶尔有，但很快消失',s:2},{l:'经常有，影响日常生活',s:3},{l:'长期存在，但检查无异常',s:4}
+  ]},
+  {dim:'社交', text:'在人群中你通常感觉？', opts:[
+    {l:'自在，享受互动',s:1},{l:'稍微有点累但总体ok',s:2},{l:'不自在，想尽快离开',s:3},{l:'极度不适，会刻意避免',s:4}
+  ]},
+  {dim:'睡眠', text:'白天你是否经常感到困倦？', opts:[
+    {l:'精力充沛，不需要补觉',s:1},{l:'偶尔犯困，但能坚持',s:2},{l:'经常犯困，影响工作/学习',s:3},{l:'整天昏昏沉沉，不补觉就扛不住',s:4}
+  ]}
+];
+
+const DIMENSIONS = [
+  {key:'睡眠',icon:'😴',color:'hsl(210,50%,50%)',label:'睡眠质量'},
+  {key:'情绪',icon:'💭',color:'hsl(330,60%,55%)',label:'情绪状态'},
+  {key:'社交',icon:'🫂',color:'hsl(170,45%,48%)',label:'社交能量'},
+  {key:'身体',icon:'❤️',color:'hsl(25,80%,55%)',label:'身体信号'},
+  {key:'认知',icon:'🧩',color:'hsl(260,50%,55%)',label:'认知功能'},
 ];
 
 const RESULTS = [
-  {
-    min: 8, max: 12,
-    icon: "🌿",
-    title: "压力值正常",
-    subtitle: "你的状态很不错！",
-    color: "#4CAF50",
-    desc: "你目前的隐形压力处于健康水平。你有良好的应对能力，身心状态都保持在平衡区间。继续保持你现在的节奏，定期给自己充电就好。",
-    tips: "🌸 继续保持规律作息和适度运动<br>🌸 你的压力管理能力已经很好，可以多和朋友分享你的经验"
-  },
-  {
-    min: 13, max: 19,
-    icon: "☁️",
-    title: "轻微压力信号",
-    subtitle: "需要适当关注一下了",
-    color: "#FF9800",
-    desc: "你的身体和情绪已经在发出一些压力信号了。虽然还能应付，但这些小信号提醒你——该给自己放个假了。",
-    tips: "🔸 每天给自己 15 分钟的「放空时间」<br>🔸 试试深呼吸：吸气4秒→停4秒→呼气6秒<br>🔸 减少不必要的社交，先照顾好自己的能量"
-  },
-  {
-    min: 20, max: 26,
-    icon: "⚡",
-    title: "中度压力预警",
-    subtitle: "你的压力已经比较明显了",
-    color: "#F44336",
-    desc: "多项指标显示，你的隐形压力已经到了不可忽视的程度。你可能已经习惯了这种紧绷状态，但这并不意味着它没有在消耗你。",
-    tips: "⚠️ 建议你停下来做个「压力排查清单」<br>⚠️ 增加运动量：快走、跑步、瑜伽都有效<br>⚠️ 找一个可以安全倾诉的人聊聊<br>⚠️ 如果持续超过一个月，建议寻求专业帮助"
-  },
-  {
-    min: 27, max: 32,
-    icon: "🔥",
-    title: "高压警报",
-    subtitle: "你承受的压力已经超负荷了",
-    color: "#9C27B0",
-    desc: "你的压力水平已经很高了。请认真对待这个结果——长期高压不仅影响心理状态，也会对身体健康造成实质性损害。",
-    tips: "🚨 这不是「扛一扛就过去」的状态<br>🚨 请尽快寻求专业心理咨询师的帮助<br>🚨 可以联系学校心理中心/企业EAP<br>🚨 告诉信任的人你现在的状态，不要一个人扛<br>📞 心理援助热线：400-161-9995（24小时）"
-  }
+  {min:15,max:25,icon:'🌿',title:'状态良好',sub:'你的压力管理做得很棒',color:'hsl(155,40%,42%)',
+   desc:'你的各项指标显示目前处于健康的压力水平。你有良好的应对机制和恢复能力，身心状态保持平衡。',
+   tips:'保持现有的生活节奏，别忘了定期给自己小奖励。你的状态也会感染身边的人！'},
+  {min:26,max:35,icon:'☁️',title:'轻度预警',sub:'压力信号已出现，该关注自己了',color:'hsl(45,80%,50%)',
+   desc:'身体和情绪开始发出一些小信号了。虽然还能应付，但这是提醒你——该给自己安排一个"充电日"了。',
+   tips:'每天给自己15分钟"放空时间"；尝试4-7-8呼吸法（吸气4秒→屏息7秒→呼6秒）；减少非必要社交；开始记录情绪日记。'},
+  {min:36,max:45,icon:'⚡',title:'中度警报',sub:'你的压力水平需要干预了',color:'hsl(20,80%,52%)',
+   desc:'多项指标显示你的隐形压力已经到了不可忽视的程度。你可能已经习惯了这种紧绷感，但这并不意味着它没有在消耗你。',
+   tips:'建议立即做一次"压力排查"；每周3次30分钟以上运动；找一个信任的人倾诉；考虑减少1-2项当前承担的责任；如持续超1个月，建议咨询专业人士。'},
+  {min:46,max:60,icon:'🔥',title:'重度预警',sub:'你承受的压力已经超负荷',color:'hsl(340,65%,50%)',
+   desc:'你的压力水平已经很高了。请一定认真对待——长期高压不仅影响心理状态，对身体健康也会造成实质性损伤。',
+   tips:'这不是"扛一扛就过去"的状态；请尽快联系专业心理咨询师（学校心理中心/企业EAP/社会机构）；告知身边信任的人你的状态；心理援助热线：400-161-9995（24小时）；必要时就医。'},
 ];
 
-let currentQuestion = 0;
-let answers = [];
+let cur=0, anss=[], startedAt=0;
 
-function startTest() {
-  document.getElementById('startPage').classList.add('hidden');
-  document.getElementById('startPage').style.display = 'none';
-  document.getElementById('questionPage').classList.remove('hidden');
-  currentQuestion = 0;
-  answers = [];
-  renderQuestion();
+function startQuiz(){
+  g('screenStart').classList.remove('active');
+  g('screenQuiz').classList.add('active');
+  cur=0; anss=[]; startedAt=Date.now();
+  renderQ();
 }
 
-function renderQuestion() {
-  const q = QUESTIONS[currentQuestion];
-  const container = document.getElementById('questionContainer');
-  const total = QUESTIONS.length;
+function renderQ(){
+  const q=QS[cur]; const total=QS.length;
+  g('qCounter').textContent = String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
+  g('qProgress').style.width = ((cur+1)/total*100)+'%';
 
-  document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${total}`;
-  document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / total) * 100}%`;
-
-  let optsHtml = '';
-  q.options.forEach((opt, idx) => {
-    optsHtml += `<div class="option" data-idx="${idx}" onclick="selectOption(${idx})">${opt.label}</div>`;
+  let opts='';
+  q.opts.forEach((o,i)=>{
+    opts+=`<div class="opt" data-i="${i}" onclick="pick(${i})">${o.l}</div>`;
   });
 
-  container.innerHTML = `
-    <div class="question">
-      <div class="q-num">第 ${currentQuestion + 1} 题</div>
+  g('qContainer').innerHTML = `
+    <div class="question-wrap">
+      <div class="q-num">${q.dim.toUpperCase()} · 第 ${cur+1} 题</div>
       <div class="q-text">${q.text}</div>
-      <div class="options">${optsHtml}</div>
+      <div class="q-dim">${q.dim}维度 · 共${QS.filter(x=>x.dim===q.dim).length}题</div>
+      <div class="options">${opts}</div>
     </div>
   `;
 }
 
-function selectOption(idx) {
-  const q = QUESTIONS[currentQuestion];
-  // Remove previous selection
-  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
-  // Add selection
-  document.querySelectorAll('.option')[idx].classList.add('selected');
+function pick(i){
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(el=>el.classList.remove('selected'));
+  opts[i].classList.add('selected');
+  anss[cur] = QS[cur].opts[i].s;
 
-  const score = q.options[idx].score;
-  answers[currentQuestion] = score;
-
-  // Auto advance after short delay
-  setTimeout(() => {
-    if (currentQuestion < QUESTIONS.length - 1) {
-      currentQuestion++;
-      renderQuestion();
-    } else {
-      showResult();
-    }
-  }, 300);
+  setTimeout(()=>{
+    if(cur<QS.length-1){cur++;renderQ()}
+    else showResult();
+  },280);
 }
 
-function showResult() {
-  const totalScore = answers.reduce((a, b) => a + b, 0);
+function showResult(){
+  g('screenQuiz').classList.remove('active');
+  g('screenResult').classList.add('active');
 
-  let result = RESULTS[0];
-  for (const r of RESULTS) {
-    if (totalScore >= r.min && totalScore <= r.max) {
-      result = r;
-      break;
-    }
-  }
-  // Fallback for max score
-  if (totalScore > RESULTS[RESULTS.length - 1].max) {
-    result = RESULTS[RESULTS.length - 1];
-  }
+  const total=anss.reduce((a,b)=>a+b,0);
+  let result=RESULTS[0];
+  for(const r of RESULTS){if(total>=r.min&&total<=r.max){result=r;break}}
+  if(total>RESULTS[3].max) result=RESULTS[3];
 
-  document.getElementById('questionPage').classList.add('hidden');
-  document.getElementById('questionPage').style.display = 'none';
-  document.getElementById('resultPage').classList.remove('hidden');
+  // Dimension scores
+  const dimScores={};
+  QS.forEach((q,i)=>{
+    if(!dimScores[q.dim]) dimScores[q.dim]={total:0,count:0};
+    dimScores[q.dim].total += (anss[i]||2);
+    dimScores[q.dim].count++;
+  });
+  const dims=DIMENSIONS.map(d=>{
+    const s=dimScores[d.key];
+    const avg=s?s.total/s.count:2;
+    return {...d,score:Math.round(avg*10)/10,pct:((avg-1)/3*100)};
+  });
 
-  document.getElementById('resultContent').innerHTML = `
-    <div class="result-icon">${result.icon}</div>
-    <div class="result-title" style="color: ${result.color}">${result.title}</div>
-    <div class="result-sub">${result.subtitle}</div>
-    <div class="result-score">${totalScore}<span> / ${QUESTIONS.length * 4}</span></div>
-    <div class="result-card">
-      <h3>📋 分析详情</h3>
-      <p>${result.desc}</p>
+  // Gauge angle: 0° for 15, 180° for 60
+  const angle = Math.min(180, Math.max(0, (total-15)/(60-15)*180));
+  const gaugePath = describeArc(90,90,72,180,180-angle);
+
+  let dimHtml = dims.map((d,i)=>`
+    <div class="dim-item fade-in-left delay-${i+1}">
+      <div class="dim-label">${d.icon} ${d.label}</div>
+      <div class="dim-bar"><div class="dim-fill" style="background:${d.color};transition-delay:${.3+i*.12}s" data-w="${d.pct}"></div></div>
     </div>
-    <div class="result-card" style="background: #fff8e1;">
+  `).join('');
+
+  let tipsCards = '';
+  if(result.tips){tipsCards = `
+    <div class="detail-card amber fade-in-left delay-4">
       <h3>💡 给你的建议</h3>
       <p>${result.tips}</p>
     </div>
-    <div class="result-actions">
-      <button class="btn" onclick="shareResult()">📋 截图分享给朋友</button>
-      <button class="btn btn-secondary" onclick="startTest()">🔄 重测一次</button>
+  `;}
+
+  g('rContainer').innerHTML = `
+    <div class="result-hero">
+      <div class="result-icon">${result.icon}</div>
+      <div class="result-title" style="color:${result.color}">${result.title}</div>
+      <div class="result-sub">${result.sub}</div>
+
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 180 180">
+          <path d="M 18 90 A 72 72 0 0 1 162 90" fill="none" stroke="hsl(var(--ink)/.08)" stroke-width="14" stroke-linecap="round"/>
+          <path d="${gaugePath}" fill="none" stroke="${result.color}" stroke-width="14" stroke-linecap="round" class="animate-gauge"/>
+        </svg>
+        <div class="gauge-score" style="color:${result.color}">${total}<span>/60</span></div>
+      </div>
+
+      <div class="score-tag" style="background:${result.color}15;color:${result.color}">${result.icon} ${result.title}</div>
     </div>
-    <div class="share-note">
-      💬 截下你的测试结果，去小红书发笔记吧！<br>
-      <strong>配文：#我的隐形压力指数 #心理测试</strong>
+
+    <div class="detail-card fade-in-left delay-1">
+      <h3>📋 综合评估</h3>
+      <p>${result.desc}</p>
+    </div>
+
+    ${tipsCards}
+
+    <div class="radar-wrap fade-in-left delay-2">
+      <h3>📊 五维压力画像</h3>
+      <div class="radar-grid">${dimHtml}</div>
+    </div>
+
+    <div class="share-card fade-in-left delay-5">
+      <div class="share-icon">${result.icon}</div>
+      <div class="share-title">${result.title}</div>
+      <div class="share-score" style="color:${result.color}">${total}<span style="font-size:18px;opacity:.6">/60</span></div>
+      <div class="share-sub">${result.sub}</div>
+      <div class="share-dim">
+        ${dims.map(d=>`<span>${d.icon} ${d.label} ${d.score.toFixed(1)}</span>`).join('')}
+      </div>
+    </div>
+    <div class="share-hint">📸 截图此卡片，分享到小红书吧！</div>
+
+    <div class="result-actions">
+      <button class="btn" onclick="g('screenResult').scrollIntoView({behavior:'smooth'});navigator.clipboard?.writeText('我刚测了隐形压力指数：${total}/60 - ${result.title} 🧠 你也来试试→ https://ethanzhang666888.github.io/ai-test-page/');alert('📋 已复制分享文案！去小红书粘贴发布吧')">📋 复制分享文案</button>
+      <button class="btn btn-outline" onclick="location.reload()">🔄 重新测试</button>
     </div>
   `;
+
+  // Animate dimension bars after render
+  setTimeout(()=>{
+    document.querySelectorAll('.dim-fill').forEach(el=>{
+      el.style.width = el.dataset.w+'%';
+    });
+  },100);
 }
 
-function shareResult() {
-  // Scroll to show full result and prompt screenshot
-  document.getElementById('resultPage').scrollIntoView({ behavior: 'smooth' });
-  alert('试下截图保存你的测试结果，发到小红书吧！');
+// SVG arc helper
+function describeArc(cx,cy,r,startDeg,endDeg){
+  const toRad=(d)=>d*Math.PI/180;
+  const polar=(deg)=>[cx+r*Math.cos(toRad(deg)),cy+r*Math.sin(toRad(deg))];
+  const start=polar(startDeg);
+  const end=polar(endDeg);
+  const large=(endDeg-startDeg)>180?1:0;
+  return `M ${start[0]} ${start[1]} A ${r} ${r} 0 ${large} 0 ${end[0]} ${end[1]}`;
 }
 
-// Prevent double-tap zoom on mobile
-document.addEventListener('touchend', function(e) {
-  const now = Date.now();
-  if (now - (document.lastTouch || 0) < 300) e.preventDefault();
-  document.lastTouch = now;
-}, false);
+function g(id){return document.getElementById(id)}
 </script>
 </body>
 </html>
