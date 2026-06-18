@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>你的「隐形压力指数」有多高？</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .container {
+    max-width: 480px;
+    width: 100%;
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    padding: 32px 24px;
+    margin-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .badge {
+    display: inline-block;
+    background: #667eea;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: 22px;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  /* Progress bar */
+  .progress-wrap {
+    background: #eee;
+    border-radius: 10px;
+    height: 6px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  .progress-text {
+    text-align: right;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+
+  /* Question */
+  .question {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  .question.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .q-num {
+    font-size: 13px;
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    padding: 14px 16px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.2s;
+    background: #fff;
+    text-align: left;
+    line-height: 1.4;
+  }
+  .option:hover { border-color: #667eea; background: #f8f9ff; }
+  .option.selected { border-color: #667eea; background: #eef0ff; color: #4a3f8a; font-weight: 500; }
+
+  /* Start page */
+  .start-page { text-align: center; padding: 20px 0; }
+  .start-page .icon { font-size: 64px; margin-bottom: 16px; }
+  .start-page .desc { font-size: 14px; color: #666; line-height: 1.7; margin-bottom: 28px; }
+  .btn {
+    display: inline-block;
+    padding: 14px 48px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(102,126,234,0.35);
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(102,126,234,0.45);
+  }
+  .btn:active { transform: translateY(0); }
+  .btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    box-shadow: none;
+  }
+  .btn-secondary:hover { background: #e4e4e4; box-shadow: none; transform: none; }
+
+  /* Result page */
+  .result-page { text-align: center; animation: fadeIn 0.5s ease; }
+  .result-page.hidden { display: none; }
+  .result-icon { font-size: 80px; margin-bottom: 8px; }
+  .result-title { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .result-sub { font-size: 14px; color: #888; margin-bottom: 20px; }
+  .result-card {
+    background: #f8f9ff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+  .result-card h3 { font-size: 15px; color: #667eea; margin-bottom: 8px; }
+  .result-card p { font-size: 14px; color: #555; line-height: 1.7; }
+  .result-score {
+    font-size: 48px;
+    font-weight: 800;
+    color: #667eea;
+    margin: 8px 0;
+  }
+  .result-score span { font-size: 18px; font-weight: 400; color: #888; }
+  .result-tips {
+    background: #fff3e0;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 13px;
+    color: #e65100;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .share-note {
+    font-size: 13px;
+    color: #999;
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+  }
+  .share-note strong { color: #667eea; }
+
+  /* Disclaimer */
+  .disclaimer {
+    font-size: 11px;
+    color: #bbb;
+    text-align: center;
+    margin-top: 20px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- Loading / Start -->
+  <div id="startPage" class="start-page">
+    <div class="badge">🔍 心理测试</div>
+    <div class="icon">🧠</div>
+    <h1>你的「隐形压力指数」有多高？</h1>
+    <p class="desc">
+      有些压力你看得见，有些压力藏在你的身体和情绪里。<br>
+      8 道题，花 2 分钟，测测你的隐形压力等级。
+    </p>
+    <button class="btn" onclick="startTest()">开始测试</button>
+    <div class="disclaimer">仅供娱乐参考，不构成心理诊断</div>
+  </div>
+
+  <!-- Questions -->
+  <div id="questionPage" class="question hidden">
+    <div class="badge" id="qBadge">🧠 隐形压力测试</div>
+    <div class="progress-text" id="progressText">1 / 8</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width: 12.5%"></div>
+    </div>
+    <div id="questionContainer"></div>
+  </div>
+
+  <!-- Result -->
+  <div id="resultPage" class="result-page hidden">
+    <div class="badge">📊 测试结果</div>
+    <div id="resultContent"></div>
+    <div class="disclaimer">仅供娱乐参考，不构成心理诊断</div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "最近一个月，你早上醒来的感觉是？",
+    options: [
+      { label: "自然醒，精力充沛", score: 1 },
+      { label: "醒来后还想再躺一会儿", score: 2 },
+      { label: "闹钟响了很久才挣扎着起来", score: 3 },
+      { label: "经常在凌晨醒来，再也睡不着", score: 4 }
+    ]
+  },
+  {
+    text: "面对日常烦心事（如排队、堵车等），你的反应是？",
+    options: [
+      { label: "完全不在意，该干嘛干嘛", score: 1 },
+      { label: "有点烦躁，但能快速调整", score: 2 },
+      { label: "容易生气，觉得事事不顺", score: 3 },
+      { label: "经常因为小事情绪崩溃", score: 4 }
+    ]
+  },
+  {
+    text: "你最近对社交活动的态度是？",
+    options: [
+      { label: "很期待，和朋友们约得很开心", score: 1 },
+      { label: "还行，偶尔会想社交", score: 2 },
+      { label: "不想出门，但被迫去也能应付", score: 3 },
+      { label: "完全不想见任何人，只想一个人待着", score: 4 }
+    ]
+  },
+  {
+    text: "你最近的身体有哪些信号？",
+    options: [
+      { label: "身体状态良好，没什么不适", score: 1 },
+      { label: "偶尔头痛或肩颈酸痛", score: 2 },
+      { label: "经常胃痛、头痛或心慌", score: 3 },
+      { label: "多种身体不适，检查又没查出问题", score: 4 }
+    ]
+  },
+  {
+    text: "你最近面对工作/学习任务时？",
+    options: [
+      { label: "高效完成，有成就感", score: 1 },
+      { label: "能完成，但需要一些额外的努力", score: 2 },
+      { label: "经常拖延，做一会儿就想放弃", score: 3 },
+      { label: "完全无法集中注意力，效率极低", score: 4 }
+    ]
+  },
+  {
+    text: "你最近的情绪状态是怎样的？",
+    options: [
+      { label: "总体平稳，大部分时间开心", score: 1 },
+      { label: "偶尔低落，但很快能恢复", score: 2 },
+      { label: "经常感到闷闷不乐或焦虑", score: 3 },
+      { label: "长期情绪低落，对什么都提不起兴趣", score: 4 }
+    ]
+  },
+  {
+    text: "你最近对未来的感觉是？",
+    options: [
+      { label: "充满期待，有很多想做的事", score: 1 },
+      { label: "平稳推进，走一步看一步", score: 2 },
+      { label: "有些迷茫，不知道未来会怎样", score: 3 },
+      { label: "觉得没有希望，做什么都没意义", score: 4 }
+    ]
+  },
+  {
+    text: "你最近有放松和娱乐的时间吗？",
+    options: [
+      { label: "有，我定期会给自己安排放松时间", score: 1 },
+      { label: "偶尔会放松一下，但不太规律", score: 2 },
+      { label: "很少放松，觉得没时间也没心情", score: 3 },
+      { label: "完全放松不下来，即使休息也在想事情", score: 4 }
+    ]
+  }
+];
+
+const RESULTS = [
+  {
+    min: 8, max: 12,
+    icon: "🌿",
+    title: "压力值正常",
+    subtitle: "你的状态很不错！",
+    color: "#4CAF50",
+    desc: "你目前的隐形压力处于健康水平。你有良好的应对能力，身心状态都保持在平衡区间。继续保持你现在的节奏，定期给自己充电就好。",
+    tips: "🌸 继续保持规律作息和适度运动<br>🌸 你的压力管理能力已经很好，可以多和朋友分享你的经验"
+  },
+  {
+    min: 13, max: 19,
+    icon: "☁️",
+    title: "轻微压力信号",
+    subtitle: "需要适当关注一下了",
+    color: "#FF9800",
+    desc: "你的身体和情绪已经在发出一些压力信号了。虽然还能应付，但这些小信号提醒你——该给自己放个假了。",
+    tips: "🔸 每天给自己 15 分钟的「放空时间」<br>🔸 试试深呼吸：吸气4秒→停4秒→呼气6秒<br>🔸 减少不必要的社交，先照顾好自己的能量"
+  },
+  {
+    min: 20, max: 26,
+    icon: "⚡",
+    title: "中度压力预警",
+    subtitle: "你的压力已经比较明显了",
+    color: "#F44336",
+    desc: "多项指标显示，你的隐形压力已经到了不可忽视的程度。你可能已经习惯了这种紧绷状态，但这并不意味着它没有在消耗你。",
+    tips: "⚠️ 建议你停下来做个「压力排查清单」<br>⚠️ 增加运动量：快走、跑步、瑜伽都有效<br>⚠️ 找一个可以安全倾诉的人聊聊<br>⚠️ 如果持续超过一个月，建议寻求专业帮助"
+  },
+  {
+    min: 27, max: 32,
+    icon: "🔥",
+    title: "高压警报",
+    subtitle: "你承受的压力已经超负荷了",
+    color: "#9C27B0",
+    desc: "你的压力水平已经很高了。请认真对待这个结果——长期高压不仅影响心理状态，也会对身体健康造成实质性损害。",
+    tips: "🚨 这不是「扛一扛就过去」的状态<br>🚨 请尽快寻求专业心理咨询师的帮助<br>🚨 可以联系学校心理中心/企业EAP<br>🚨 告诉信任的人你现在的状态，不要一个人扛<br>📞 心理援助热线：400-161-9995（24小时）"
+  }
+];
+
+let currentQuestion = 0;
+let answers = [];
+
+function startTest() {
+  document.getElementById('startPage').classList.add('hidden');
+  document.getElementById('startPage').style.display = 'none';
+  document.getElementById('questionPage').classList.remove('hidden');
+  currentQuestion = 0;
+  answers = [];
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQuestion];
+  const container = document.getElementById('questionContainer');
+  const total = QUESTIONS.length;
+
+  document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / total) * 100}%`;
+
+  let optsHtml = '';
+  q.options.forEach((opt, idx) => {
+    optsHtml += `<div class="option" data-idx="${idx}" onclick="selectOption(${idx})">${opt.label}</div>`;
+  });
+
+  container.innerHTML = `
+    <div class="question">
+      <div class="q-num">第 ${currentQuestion + 1} 题</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">${optsHtml}</div>
+    </div>
+  `;
+}
+
+function selectOption(idx) {
+  const q = QUESTIONS[currentQuestion];
+  // Remove previous selection
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  // Add selection
+  document.querySelectorAll('.option')[idx].classList.add('selected');
+
+  const score = q.options[idx].score;
+  answers[currentQuestion] = score;
+
+  // Auto advance after short delay
+  setTimeout(() => {
+    if (currentQuestion < QUESTIONS.length - 1) {
+      currentQuestion++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 300);
+}
+
+function showResult() {
+  const totalScore = answers.reduce((a, b) => a + b, 0);
+
+  let result = RESULTS[0];
+  for (const r of RESULTS) {
+    if (totalScore >= r.min && totalScore <= r.max) {
+      result = r;
+      break;
+    }
+  }
+  // Fallback for max score
+  if (totalScore > RESULTS[RESULTS.length - 1].max) {
+    result = RESULTS[RESULTS.length - 1];
+  }
+
+  document.getElementById('questionPage').classList.add('hidden');
+  document.getElementById('questionPage').style.display = 'none';
+  document.getElementById('resultPage').classList.remove('hidden');
+
+  document.getElementById('resultContent').innerHTML = `
+    <div class="result-icon">${result.icon}</div>
+    <div class="result-title" style="color: ${result.color}">${result.title}</div>
+    <div class="result-sub">${result.subtitle}</div>
+    <div class="result-score">${totalScore}<span> / ${QUESTIONS.length * 4}</span></div>
+    <div class="result-card">
+      <h3>📋 分析详情</h3>
+      <p>${result.desc}</p>
+    </div>
+    <div class="result-card" style="background: #fff8e1;">
+      <h3>💡 给你的建议</h3>
+      <p>${result.tips}</p>
+    </div>
+    <div class="result-actions">
+      <button class="btn" onclick="shareResult()">📋 截图分享给朋友</button>
+      <button class="btn btn-secondary" onclick="startTest()">🔄 重测一次</button>
+    </div>
+    <div class="share-note">
+      💬 截下你的测试结果，去小红书发笔记吧！<br>
+      <strong>配文：#我的隐形压力指数 #心理测试</strong>
+    </div>
+  `;
+}
+
+function shareResult() {
+  // Scroll to show full result and prompt screenshot
+  document.getElementById('resultPage').scrollIntoView({ behavior: 'smooth' });
+  alert('试下截图保存你的测试结果，发到小红书吧！');
+}
+
+// Prevent double-tap zoom on mobile
+document.addEventListener('touchend', function(e) {
+  const now = Date.now();
+  if (now - (document.lastTouch || 0) < 300) e.preventDefault();
+  document.lastTouch = now;
+}, false);
+</script>
+</body>
+</html>
